@@ -8,7 +8,7 @@ function setup() {
     frameRate(10)
 
     let chance = [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 2, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 2]
-        // генерируем свою матрицу
+    // генерируем свою матрицу
     matrix = []
     for (let y = 0; y < 90; y++) {
         let abob = []
@@ -37,6 +37,23 @@ function setup() {
     }
 
 }
+function mouseClicked() {
+    if (mouseX < 1000&& mouseY < 1000 && mouseX > 0 && mouseY > 0) {
+        console.log(mouseX, mouseY)
+        let indexY = parseInt(mouseY / 10)
+        let indexX = parseInt(mouseX / 10)
+        console.log(indexY, indexX)
+        if (matrix[indexY][indexX] === 1) {
+            grassArr.splice(grassArr.findIndex(item => item.x === indexX && item.y === indexY), 1)
+        }
+        if (matrix[indexY][indexX] === 3) {
+            grassEaterArr.splice(grassEaterArr.findIndex(item => item.x === indexX && item.y === indexY), 1)
+        }
+        matrix[indexY][indexX] = 2
+        let ge = new GrassEater(indexX, indexY)
+        grassEaterArr.push(ge)
+    }
+}
 
 function draw() {
     // noStroke()
@@ -45,13 +62,22 @@ function draw() {
     for (let y = 0; y < matrix.length; y++) {
         for (let x = 0; x < matrix[y].length; x++) {
             if (matrix[y][x] == 1) {
-                fill('green')
+                if (season == "summer") {
+                    fill("green")
+                } else if (season == "winter") {
+                    fill("white")
+                }
+                if (season == "autumn") {
+                    fill("yellow")
+                } else if (season == "spring") {
+                    fill("pink")
+                }
             } else if (matrix[y][x] == 2) {
                 fill('black')
             } else if (matrix[y][x] == 3) {
                 fill('red')
             } else {
-                fill('white')
+                fill('lightblue')
             }
             rect(x * 10, y * 10, 10, 10)
 
@@ -101,7 +127,7 @@ class LivingCreature {
         return found;
     }
 }
-class Grass extends LivingCreature{
+class Grass extends LivingCreature {
     constructor(x, y) {
         super(x, y)
         this.multiply = 0
@@ -122,7 +148,7 @@ class Grass extends LivingCreature{
     mul() {
         this.multiply++;
         let newCell = random(this.chooseCell(0))
-            // console.log(newCell, this.multiply)
+        // console.log(newCell, this.multiply)
         if (this.multiply >= 4 && newCell) {
             let newGrass = new Grass(newCell[0], newCell[1])
             grassArr.push(newGrass)
@@ -135,7 +161,7 @@ class Grass extends LivingCreature{
 
 class GrassEater extends LivingCreature {
     constructor(x, y) {
-       super(x, y)
+        super(x, y)
         this.energy = 0
         this.directions = [
             [this.x - 1, this.y - 1],
@@ -185,7 +211,7 @@ class GrassEater extends LivingCreature {
             matrix[this.y][this.x] = 2
             this.getNewCoordinates()
             this.energy++
-                this.mul()
+            this.mul()
 
         } else {
             // двигаться и умереть
@@ -228,7 +254,7 @@ class GrassEater extends LivingCreature {
     }
 }
 
-class Predator extends LivingCreature{
+class Predator extends LivingCreature {
     constructor(x, y) {
         super(x, y)
         this.directions = [
