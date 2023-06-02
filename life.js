@@ -38,7 +38,7 @@ function setup() {
 
 }
 function mouseClicked() {
-    if (mouseX < 1000&& mouseY < 1000 && mouseX > 0 && mouseY > 0) {
+    if (mouseX < 1000 && mouseY < 1000 && mouseX > 0 && mouseY > 0) {
         console.log(mouseX, mouseY)
         let indexY = parseInt(mouseY / 10)
         let indexX = parseInt(mouseX / 10)
@@ -46,12 +46,39 @@ function mouseClicked() {
         if (matrix[indexY][indexX] === 1) {
             grassArr.splice(grassArr.findIndex(item => item.x === indexX && item.y === indexY), 1)
         }
-        if (matrix[indexY][indexX] === 3) {
+        if (matrix[indexY][indexX] === 2) {
             grassEaterArr.splice(grassEaterArr.findIndex(item => item.x === indexX && item.y === indexY), 1)
         }
-        matrix[indexY][indexX] = 2
-        let ge = new GrassEater(indexX, indexY)
-        grassEaterArr.push(ge)
+        if (matrix[indexY][indexX] === 3) {
+            predatorArr.splice(predatorArr.findIndex(item => item.x === indexX && item.y === indexY), 1)
+        }
+        if (create == "grassEater") {
+            matrix[indexY][indexX] = 2
+            let ge = new GrassEater(indexX, indexY)
+            grassEaterArr.push(ge)
+        }
+        else if (create == "grass") {
+            matrix[indexY][indexX] = 1
+            let g = new Grass(indexX, indexY)
+            grassArr.push(g)
+        }
+        else if (create == "boom") {
+
+            for (let y = indexY - 5; y <= indexY + 5; y++) {
+                for (let x = indexX - 5; x <= indexX + 5; x++) {
+                    if (matrix[y][x] === 1) {
+                        grassArr.splice(grassArr.findIndex(item => item.x === x && item.y === y), 1)
+                    }
+                    if (matrix[y][x] === 2) {
+                        grassEaterArr.splice(grassEaterArr.findIndex(item => item.x === x && item.y === y), 1)
+                    }
+                    if (matrix[y][x] === 3) {
+                        predatorArr.splice(predatorArr.findIndex(item => item.x === x && item.y === y), 1)
+                    }
+                    matrix[y][x] = 0
+                }
+            }
+        }
     }
 }
 
@@ -349,3 +376,9 @@ class Predator extends LivingCreature {
         }
     }
 }
+setInterval(() => {
+    fetch("http://localhost:3000/", {
+        method: "POST",
+        body: `Кол-во травы: ${grassArr.length}, Кол-во травоядных: ${grassEaterArr.length}, Кол-во хищников: ${predatorArr.length},`
+    })
+}, 5000)
